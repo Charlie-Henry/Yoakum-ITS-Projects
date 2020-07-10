@@ -95,8 +95,8 @@
     var map = new mapboxgl.Map({
       container: 'map', // container id
       style: 'mapbox://styles/charlie2343/ckcfdyfph01ms1iqz9vnd7ft6', //stylesheet location
-      center: [-97.754543,30.276695], // starting position
-      zoom: 10,// starting zoom
+      center: [-96.695453,29.304644, ], // starting position
+      zoom: 9,// starting zoom
       transformRequest: transformRequest
     });
 
@@ -128,21 +128,82 @@
                 'data': data
               },
               'paint': {
-                'circle-radius': 5,
-                'circle-color': e.features[0].properties.Color
-              }
+                'circle-radius': 7,
+                'circle-color':  [
+                'match',
+                ['get','Status'],
+                'Not Started',
+                '#C0C0C0',
+                'Started',
+                '#E5E500',
+                'Completed',
+                '#008000',
+                '#ccc'],
+                'circle-stroke-width' : 1
+              },
+              'filter': ['==','Signal','Yes']
+            });
+            map.loadImage('https://raw.githubusercontent.com/Charlie-Henry/Yoakum-ITS-Projects/master/icons8-indoor-camera-30-gray.png', 
+              function(error,image){
+                if (error) throw error;
+                map.addImage('gray_icon', image);
+              });
+
+            map.loadImage('https://raw.githubusercontent.com/Charlie-Henry/Yoakum-ITS-Projects/master/icons8-indoor-camera-30-yellow.png', 
+              function(error,image){
+                if (error) throw error;
+                map.addImage('yellow_icon', image);
+              });
+
+            map.loadImage('https://raw.githubusercontent.com/Charlie-Henry/Yoakum-ITS-Projects/master/icons8-indoor-camera-30-green.png', 
+              function(error,image){
+                if (error) throw error;
+                map.addImage('green_icon', image);
+              });
+              
+            map.addLayer({
+              'id': 'csvData2',
+              'type': 'symbol',
+              'source': {
+                'type': 'geojson',
+                'data': data
+              },
+              'layout': {
+                'icon-image': [
+                'match',
+                ['get','Status'],
+                'Not Started',
+                'gray_icon',
+                'Started',
+                'yellow_icon',
+                'Completed',
+                'green_icon',
+                '#ccc'],
+                'icon-size':0.75
+              },
+              'filter': ['==','Signal','No']
             });
 
 
             // When a click event occurs on a feature in the csvData layer, open a popup at the
             // location of the feature, with description HTML from its properties.
-            map.on('click', 'csvData', function (e) {
+            map.on('click','csvData', function (e) {
               var coordinates = e.features[0].geometry.coordinates.slice();
 
               //set popup text 
               //You can adjust the values of the popup to match the headers of your CSV. 
               // For example: e.features[0].properties.Name is retrieving information from the field Name in the original CSV. 
-              var description = `<h3>` + e.features[0].properties.Name + `</h3>` + `<h4>` + `<b>` + `Address: ` + `</b>` + e.features[0].properties.Address + `</h4>` + `<h4>` + `<b>` + `Phone: ` + `</b>` + e.features[0].properties.Phone + `</h4>`;
+
+              if (e.features[0].properties.Signal == "Yes") {
+                  var description = `<h3>` + e.features[0].properties.Intersection + `</h3>` + `<h4>` + `<b>` + `Project Type: ` + `</b>` + e.features[0].properties.Project_Type + `</h4>` + `<h4>` + `<b>` + `Signal ID: ` + `</b>` + e.features[0].properties.Signal_ID + `</h4>` + `<h4>` + `<b>` + `Project Status: ` + `</b>` + e.features[0].properties.Status + `</h4>` + `<h4>` + `<b>` + `Area Office: ` + `</b>` + e.features[0].properties.Area_Office + `</h4>`;
+              } 
+
+              else{  
+                var description = `<h3>` + e.features[0].properties.Project_Type + `</h3>` + `<h4>` + `<b>` + `Description: ` + `</b>` + e.features[0].properties.Project_Description + `</h4>` + `<h4>` + `<b>` + `Project Number: ` + `</b>` + e.features[0].properties.Project_Number + `</h4>` + `<h4>` + `<b>` + `Project Status: ` + `</b>` + e.features[0].properties.Status + `</h4>`;
+              }
+              /*
+              var description = `<h3>` + e.features[0].properties.Name + `</h3>` + `<h4>` + `<b>` + `Address: ` + `</b>` + e.features[0].properties.Address + `</h4>` + `<h4>` + `<b>` + `Phone: ` + `</b>` + e.features[0].properties.Phone + `</h4>`;*/
+
 
               // Ensure that if the map is zoomed out such that multiple
               // copies of the feature are visible, the popup appears
@@ -158,6 +219,40 @@
                 .setHTML(description)
                 .addTo(map);
             });
+
+            map.on('click','csvData2', function (e) {
+              var coordinates = e.features[0].geometry.coordinates.slice();
+
+              //set popup text 
+              //You can adjust the values of the popup to match the headers of your CSV. 
+              // For example: e.features[0].properties.Name is retrieving information from the field Name in the original CSV. 
+
+              if (e.features[0].properties.Signal == "Yes") {
+                  var description = `<h3>` + e.features[0].properties.Intersection + `</h3>` + `<h4>` + `<b>` + `Project Type: ` + `</b>` + e.features[0].properties.Project_Type + `</h4>` + `<h4>` + `<b>` + `Signal ID: ` + `</b>` + e.features[0].properties.Signal_ID + `</h4>` + `<h4>` + `<b>` + `Project Status: ` + `</b>` + e.features[0].properties.Status + `</h4>` + `<h4>` + `<b>` + `Area Office: ` + `</b>` + e.features[0].properties.Area_Office + `</h4>`;
+              } 
+
+              else{  
+                var description = `<h3>` + e.features[0].properties.Project_Type + `</h3>` + `<h4>` + `<b>` + `Description: ` + `</b>` + e.features[0].properties.Project_Description + `</h4>` + `<h4>` + `<b>` + `Project Number: ` + `</b>` + e.features[0].properties.Project_Number + `</h4>` + `<h4>` + `<b>` + `Project Status: ` + `</b>` + e.features[0].properties.Status + `</h4>`;
+              }
+              /*
+              var description = `<h3>` + e.features[0].properties.Name + `</h3>` + `<h4>` + `<b>` + `Address: ` + `</b>` + e.features[0].properties.Address + `</h4>` + `<h4>` + `<b>` + `Phone: ` + `</b>` + e.features[0].properties.Phone + `</h4>`;*/
+
+
+              // Ensure that if the map is zoomed out such that multiple
+              // copies of the feature are visible, the popup appears
+              // over the copy being pointed to.
+              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+              }
+
+              //add Popup to map
+
+              new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+            });
+
 
             // Change the cursor to a pointer when the mouse is over the places layer.
             map.on('mouseenter', 'csvData', function () {
