@@ -91,11 +91,11 @@
       };
     };
     //YOUR TURN: add your Mapbox token 
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhcmxpZTIzNDMiLCJhIjoiY2tiMTFqa2NpMDFkMjJxbHRpaTF1bHdrcCJ9.cZb6dlMtVboQInxlQmbASw'; //Mapbox token 
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhcmxpZTIzNDMiLCJhIjoiY2p1MzBiYWRlMDF3eTRlczdoaHFxMzl0MCJ9.juqQvFAijgos8InomJ-R7A'; //Mapbox token 
     var map = new mapboxgl.Map({
       container: 'map', // container id
-      style: 'mapbox://styles/charlie2343/ckcfdyfph01ms1iqz9vnd7ft6', //stylesheet location
-      center: [-96.695453,29.304644, ], // starting position
+      style: 'mapbox://styles/charlie2343/ckb1301f709c51in30mgwbe9h', //stylesheet location
+      center: [-97.607154,30.462979, ], // starting position
       zoom: 9,// starting zoom
       transformRequest: transformRequest
     });
@@ -104,7 +104,7 @@
       $.ajax({
         type: "GET",
         //YOUR TURN: Replace with csv export link
-        url: 'https://docs.google.com/spreadsheets/d/1MayC8XrsuUGdyhQ0PSsXUc0aH40zxxTJSEbDfJ81Zpc/gviz/tq?tqx=out:csv&sheet=Sheet1',
+        url: 'https://docs.google.com/spreadsheets/d/1isCZik-Z5gcOPEeyY0a3aAzqch2NZy4DdUufw1sUS6Q/gviz/tq?tqx=out:csv&sheet=Sheet1',
         dataType: "text",
         success: function (csvData) { makeGeoJSON(csvData); }
       });
@@ -129,61 +129,19 @@
               },
               'paint': {
                 'circle-radius': 7,
-                'circle-color':  [
+                'circle-color': [
                 'match',
-                ['get','Status'],
-                'Not Started',
+                ['get','Year'],
+                '2015',
                 '#C0C0C0',
-                'Started',
+                '2016',
                 '#E5E500',
-                'Completed',
+                '2017',
                 '#008000',
                 '#ccc'],
                 'circle-stroke-width' : 1
               },
-              'filter': ['!=','Signal','No']
             });
-            map.loadImage('https://raw.githubusercontent.com/Charlie-Henry/Yoakum-ITS-Projects/master/icons8-indoor-camera-30-gray.png', 
-              function(error,image){
-                if (error) throw error;
-                map.addImage('gray_icon', image);
-              });
-
-            map.loadImage('https://raw.githubusercontent.com/Charlie-Henry/Yoakum-ITS-Projects/master/icons8-indoor-camera-30-yellow.png', 
-              function(error,image){
-                if (error) throw error;
-                map.addImage('yellow_icon', image);
-              });
-
-            map.loadImage('https://raw.githubusercontent.com/Charlie-Henry/Yoakum-ITS-Projects/master/icons8-indoor-camera-30-green.png', 
-              function(error,image){
-                if (error) throw error;
-                map.addImage('green_icon', image);
-              });
-              
-            map.addLayer({
-              'id': 'csvData2',
-              'type': 'symbol',
-              'source': {
-                'type': 'geojson',
-                'data': data
-              },
-              'layout': {
-                'icon-image': [
-                'match',
-                ['get','Status'],
-                'Not Started',
-                'gray_icon',
-                'Started',
-                'yellow_icon',
-                'Completed',
-                'green_icon',
-                '#ccc'],
-                'icon-size':0.75
-              },
-              'filter': ['==','Signal','No']
-            });
-
 
             // When a click event occurs on a feature in the csvData layer, open a popup at the
             // location of the feature, with description HTML from its properties.
@@ -194,46 +152,7 @@
               //You can adjust the values of the popup to match the headers of your CSV. 
               // For example: e.features[0].properties.Name is retrieving information from the field Name in the original CSV. 
 
-              if (e.features[0].properties.Signal == "Yes") {
-                  var description = `<h3>` + e.features[0].properties.Intersection + `</h3>` + `<h4>` + `<b>` + `Project Type: ` + `</b>` + e.features[0].properties.Project_Type + `</h4>` + `<h4>` + `<b>` + `Signal ID: ` + `</b>` + e.features[0].properties.Signal_ID + `</h4>` + `<h4>` + `<b>` + `Project Status: ` + `</b>` + e.features[0].properties.Status + `</h4>` + `<h4>` + `<b>` + `Area Office: ` + `</b>` + e.features[0].properties.Area_Office + `</h4>`;
-              } 
-
-              else{  
-                var description = `<h3>` + e.features[0].properties.Project_Type + `</h3>` + `<h4>` + `<b>` + `Description: ` + `</b>` + e.features[0].properties.Project_Description + `</h4>` + `<h4>` + `<b>` + `Project Number: ` + `</b>` + e.features[0].properties.Project_Number + `</h4>` + `<h4>` + `<b>` + `Project Status: ` + `</b>` + e.features[0].properties.Status + `</h4>`;
-              }
-              /*
-              var description = `<h3>` + e.features[0].properties.Name + `</h3>` + `<h4>` + `<b>` + `Address: ` + `</b>` + e.features[0].properties.Address + `</h4>` + `<h4>` + `<b>` + `Phone: ` + `</b>` + e.features[0].properties.Phone + `</h4>`;*/
-
-
-              // Ensure that if the map is zoomed out such that multiple
-              // copies of the feature are visible, the popup appears
-              // over the copy being pointed to.
-              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-              }
-
-              //add Popup to map
-
-              new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(description)
-                .addTo(map);
-            });
-
-            map.on('click','csvData2', function (e) {
-              var coordinates = e.features[0].geometry.coordinates.slice();
-
-              //set popup text 
-              //You can adjust the values of the popup to match the headers of your CSV. 
-              // For example: e.features[0].properties.Name is retrieving information from the field Name in the original CSV. 
-
-              if (e.features[0].properties.Signal == "Yes") {
-                  var description = `<h3>` + e.features[0].properties.Intersection + `</h3>` + `<h4>` + `<b>` + `Project Type: ` + `</b>` + e.features[0].properties.Project_Type + `</h4>` + `<h4>` + `<b>` + `Signal ID: ` + `</b>` + e.features[0].properties.Signal_ID + `</h4>` + `<h4>` + `<b>` + `Project Status: ` + `</b>` + e.features[0].properties.Status + `</h4>` + `<h4>` + `<b>` + `Area Office: ` + `</b>` + e.features[0].properties.Area_Office + `</h4>`;
-              } 
-
-              else{  
-                var description = `<h3>` + e.features[0].properties.Project_Type + `</h3>` + `<h4>` + `<b>` + `Description: ` + `</b>` + e.features[0].properties.Project_Description + `</h4>` + `<h4>` + `<b>` + `Project Number: ` + `</b>` + e.features[0].properties.Project_Number + `</h4>` + `<h4>` + `<b>` + `Project Status: ` + `</b>` + e.features[0].properties.Status + `</h4>`;
-              }
+               var description = `<h3>` + e.features[0].properties.Name + `</h3>` + `<h4>` + `<b>` + `Study Name: ` + `</b>` + e.features[0].properties.TIA_Name + `</h4>` + `<h4>` + `<b>` + `Link: ` + `</b>` + `<a href="` + e.features[0].properties.Link + `" target=_"blank">` + e.features[0].properties.Location + `</a>` + `</h4>` + `<h4>` + `<b>` + `AM Date: ` + `</b>` + e.features[0].properties.Date_AM + `</h4>`+ `<h4>` + `<b>` + `PM Date: ` + `</b>` + e.features[0].properties.Date_PM + `</h4>`+ `<h4>` + `<b>` + `Weekend Date: ` + `</b>` + e.features[0].properties.Date_Wknd + `</h4>`;
               /*
               var description = `<h3>` + e.features[0].properties.Name + `</h3>` + `<h4>` + `<b>` + `Address: ` + `</b>` + e.features[0].properties.Address + `</h4>` + `<h4>` + `<b>` + `Phone: ` + `</b>` + e.features[0].properties.Phone + `</h4>`;*/
 
